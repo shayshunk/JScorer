@@ -148,8 +148,7 @@ input[type="number"]::-webkit-outer-spin-button {
 
 .sound-button {
   flex: 100%;
-  width: 150px;
-  height: 100px;
+  aspect-ratio: 16/9;
   background-color: var(--dark-blue);
   background-image: var(--gradient);
   background-size: 300%;
@@ -356,8 +355,9 @@ img {
 }
 
 .main-container {
-  display: flex;
+  display: block;
   height: 100vh;
+  width: 100vw;
   flex-flow: column;
 }
 
@@ -368,7 +368,8 @@ img {
 
 .main-container .button-container {
   flex: 1 1 auto;
-  overflow: auto;
+  width: 100%;
+  height: 80%;
 }
 
 .button-container::-webkit-scrollbar {
