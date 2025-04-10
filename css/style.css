@@ -11,19 +11,13 @@
   --cerulean: #80847a;
   --cerulean-hover: #91958a;
   --cerulean-active: #6c7067;
-  --gradient: linear-gradient(
-    301deg,
-    #2a1794 0%,
-    #341bc2 30%,
-    #4322ff 62%,
-    #5d41ff 100%
-  );
+  --gradient: linear-gradient(301deg, #2a1794 0%, #341bc2 30%, #4322ff 62%, #5d41ff 100%);
 }
 
 * {
   margin: 0;
   padding: 0;
-  font-family: "Agency FB";
+  font-family: "ITC_ Korrina";
 }
 
 body {
@@ -170,8 +164,8 @@ input[type="number"]::-webkit-outer-spin-button {
   padding-bottom: 2%;
   border-radius: 12px;
   position: relative;
-  transition: transform 250ms ease-in, font-size 250ms,
-    background-position 500ms, opacity 350ms ease-out, filter 350ms ease;
+  transition: transform 250ms ease-in, font-size 250ms, background-position 500ms, opacity 350ms ease-out,
+    filter 350ms ease;
 
   white-space: normal;
   word-wrap: break-word;
