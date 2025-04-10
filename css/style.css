@@ -33,23 +33,9 @@ body {
   text-decoration: underline;
 }
 
-#VolumeText {
-  font-size: 2em;
-}
-
-#ColumnText {
-  font-size: 2em;
-}
-
-#inputDiv {
-  text-align: center;
-}
-
-#soundPrompt {
-  text-align: center;
-  font-size: 2.5em;
-  padding-top: 2%;
-  padding-bottom: 3%;
+#Score {
+  font-size: 3vw;
+  padding: 1%;
 }
 
 #inputForm {
@@ -119,7 +105,7 @@ input[type="number"]::-webkit-outer-spin-button {
   filter: brightness(80%);
 }
 
-#sound-buttons {
+#answer-buttons {
   display: grid;
   justify-content: space-evenly;
   grid-template-columns: repeat(6, 1fr);
@@ -127,7 +113,7 @@ input[type="number"]::-webkit-outer-spin-button {
   gap: 5px;
 }
 
-.sound-button {
+.answer-button {
   flex: 100%;
   background-color: var(--dark-blue);
   background-image: var(--gradient);
@@ -150,14 +136,53 @@ input[type="number"]::-webkit-outer-spin-button {
   word-wrap: break-word;
 }
 
-.sound-button.deleted {
+.category-button {
+  flex: 100%;
+  background-color: var(--dark-blue);
+  background-image: var(--gradient);
+  background-size: 300%;
+  background-position: right;
+
+  border: none;
+  cursor: pointer;
+  font-size: 2.5vw;
+  color: white;
+  padding: 1.5%;
+  padding-top: 2%;
+  padding-bottom: 2%;
+  border-radius: 8px;
+  position: relative;
+  transition: transform 250ms ease-in, font-size 250ms, background-position 500ms, opacity 350ms ease-out,
+    filter 350ms ease;
+
+  white-space: normal;
+  word-wrap: break-word;
+}
+
+.check-button {
+  flex: 25%;
+  flex-grow: 0;
+  cursor: pointer;
+  background-color: #0da032;
+  border: none;
+  font-size: 2em;
+  color: white;
+  padding-left: 2%;
+  padding-right: 2%;
+  border-radius: 100%;
+  transition-property: filter, transform, opacity;
+  transition-duration: 350ms;
+  transition-timing-function: ease-in;
+}
+
+.answer-button.deleted {
   opacity: 0;
   filter: blur(10px);
   transform: scale(1.2);
   transform: translateY(-1em);
 }
 
-.sound-button:active {
+.answer-button:active {
   filter: brightness(80%);
 }
 
@@ -368,4 +393,29 @@ img {
 
 .button-container::-webkit-scrollbar-track {
   background-color: rgba(108, 108, 108, 0);
+}
+
+/* Add this in your CSS */
+.modal {
+  display: none;
+  position: fixed;
+  z-index: 999;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  overflow: auto;
+  background-color: rgba(0, 0, 0, 0.5);
+}
+
+.modal-content {
+  position: relative;
+  top: 15vw;
+  background-color: #000000;
+  margin: 15% auto;
+  align-items: end;
+  padding: 20px;
+  border-radius: 4px;
+  width: 33%;
+  color: #ffffff;
 }
