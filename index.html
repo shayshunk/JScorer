@@ -5,10 +5,7 @@
     <link href="./css/style.css" rel="stylesheet" />
     <meta charset="UTF-8" />
     <!-- https://developer.mozilla.org/en-US/docs/Web/HTTP/CSP -->
-    <meta
-      http-equiv="Content-Security-Policy"
-      content="default-src 'self'; script-src 'self'"
-    />
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'" />
     <title>Soundboard</title>
   </head>
 
@@ -16,41 +13,52 @@
     <div class="main-container">
       <div class="menu-container">
         <div>
-          <h1 id="Title">Soundboard</h1>
+          <h1 id="Title">JScorer</h1>
         </div>
-        <div class="slider-container">
-          <h2 id="ColumnText">Columns</h2>
-          <input
-            type="number"
-            id="Columns"
-            class="column-setter"
-            min="1"
-            max="20"
-            value="5"
-          />
-          <h2 id="VolumeText">Master Volume</h2>
-          <input
-            type="range"
-            id="MainVolume"
-            class="main-volume-slider"
-            min="0"
-            max="100"
-            value="100"
-          />
-        </div>
-
         <div class="primary-buttons">
-          <button type="button" class="primary-button" id="AddSound">
-            Add Sound
-          </button>
-          <button type="button" class="primary-button" id="Alphabetize">
-            Alphabetize
-          </button>
+          <button type="button" class="primary-button" id="Undo">Undo</button>
           <button type="button" class="primary-button" id="Reset">Reset</button>
         </div>
       </div>
       <div class="button-container" id="button-cont">
-        <div id="sound-buttons"></div>
+        <div id="sound-buttons">
+          <button type="button" class="sound-button" id="AddSound">Category</button>
+          <button type="button" class="sound-button" id="AddSound">Category</button>
+          <button type="button" class="sound-button" id="AddSound">Category</button>
+          <button type="button" class="sound-button" id="AddSound">Category</button>
+          <button type="button" class="sound-button" id="AddSound">Category</button>
+          <button type="button" class="sound-button" id="AddSound">Category</button>
+          <button type="button" class="sound-button" id="AddSound">$200</button>
+          <button type="button" class="sound-button" id="AddSound">$200</button>
+          <button type="button" class="sound-button" id="AddSound">$200</button>
+          <button type="button" class="sound-button" id="AddSound">$200</button>
+          <button type="button" class="sound-button" id="AddSound">$200</button>
+          <button type="button" class="sound-button" id="AddSound">$200</button>
+          <button type="button" class="sound-button" id="AddSound">$400</button>
+          <button type="button" class="sound-button" id="AddSound">$400</button>
+          <button type="button" class="sound-button" id="AddSound">$400</button>
+          <button type="button" class="sound-button" id="AddSound">$400</button>
+          <button type="button" class="sound-button" id="AddSound">$400</button>
+          <button type="button" class="sound-button" id="AddSound">$400</button>
+          <button type="button" class="sound-button" id="AddSound">$600</button>
+          <button type="button" class="sound-button" id="AddSound">$600</button>
+          <button type="button" class="sound-button" id="AddSound">$600</button>
+          <button type="button" class="sound-button" id="AddSound">$600</button>
+          <button type="button" class="sound-button" id="AddSound">$600</button>
+          <button type="button" class="sound-button" id="AddSound">$600</button>
+          <button type="button" class="sound-button" id="AddSound">$800</button>
+          <button type="button" class="sound-button" id="AddSound">$800</button>
+          <button type="button" class="sound-button" id="AddSound">$800</button>
+          <button type="button" class="sound-button" id="AddSound">$800</button>
+          <button type="button" class="sound-button" id="AddSound">$800</button>
+          <button type="button" class="sound-button" id="AddSound">$800</button>
+          <button type="button" class="sound-button" id="AddSound">$1000</button>
+          <button type="button" class="sound-button" id="AddSound">$1000</button>
+          <button type="button" class="sound-button" id="AddSound">$1000</button>
+          <button type="button" class="sound-button" id="AddSound">$1000</button>
+          <button type="button" class="sound-button" id="AddSound">$1000</button>
+          <button type="button" class="sound-button" id="AddSound">$1000</button>
+        </div>
       </div>
     </div>
 

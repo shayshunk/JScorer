@@ -141,7 +141,7 @@ input[type="number"]::-webkit-outer-spin-button {
 #sound-buttons {
   display: grid;
   justify-content: space-evenly;
-  grid-template-columns: repeat(5, 1fr);
+  grid-template-columns: repeat(6, 1fr);
   padding: 2%;
   gap: 10px;
 }
