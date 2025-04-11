@@ -3,22 +3,26 @@ const { ipcRenderer } = require("electron");
 var fs = require("fs");
 
 // Grabbing HTML elements
+let buttonValue;
+
+const scoreText = document.getElementById("Score");
+let scoreValue = 0;
+
 const answerBtns = document.querySelectorAll(".answer-button");
 console.log(answerBtns);
-answerBtns.forEach((btn) => btn.addEventListener("click", () => showModal()));
+answerBtns.forEach((btn) =>
+  btn.addEventListener("click", (event) => {
+    showModal();
+    buttonValue = event.target.textContent.substring(1);
+    buttonValue = parseInt(buttonValue);
+  })
+);
 
 const checkButton = document.getElementById("CheckButton");
 checkButton.innerHTML = '<img src="assets/check-mark.png" height="33">';
 
 const wrongButton = document.getElementById("WrongButton");
 wrongButton.innerHTML = '<img src="assets/wrong.png" width="33">';
-
-const soundDiv = document.getElementById("answer-buttons");
-const buttonContainer = document.getElementById("button-cont");
-const resetBtn = document.getElementById("Reset");
-const alphabetizeBtn = document.getElementById("Alphabetize");
-const masterVolumeSlider = document.getElementById("MainVolume");
-const columnInput = document.getElementById("Columns");
 
 // Add this to a script tag or your renderer JS file
 const modal = document.getElementById("myModal");
@@ -36,8 +40,31 @@ window.addEventListener("click", (event) => {
   }
 });
 
-// Setting up add sound button
-// answerBtn.addEventListener("click", () => answer());
+checkButton.addEventListener("click", (event) => {
+  if (scoreValue + buttonValue < 0) {
+    scoreText.textContent = "Score: -$" + Math.abs(scoreValue + buttonValue);
+  } else {
+    scoreText.textContent = "Score: $" + (scoreValue + buttonValue);
+  }
+  scoreValue = scoreValue + buttonValue;
+  console.log(scoreValue);
+  console.log(buttonValue);
+  console.log(scoreValue + buttonValue);
+  modal.style.display = "none";
+});
+
+wrongButton.addEventListener("click", (event) => {
+  if (scoreValue - buttonValue < 0) {
+    scoreText.textContent = "Score: -$" + Math.abs(scoreValue - buttonValue);
+  } else {
+    scoreText.textContent = "Score: $" + (scoreValue - buttonValue);
+  }
+  scoreValue = scoreValue - buttonValue;
+  console.log(scoreValue);
+  console.log(buttonValue);
+  console.log(scoreValue - buttonValue);
+  modal.style.display = "none";
+});
 
 // Variables
 let buttonName;
