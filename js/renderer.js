@@ -8,7 +8,10 @@ console.log(answerBtns);
 answerBtns.forEach((btn) => btn.addEventListener("click", () => showModal()));
 
 const checkButton = document.getElementById("CheckButton");
-checkButton.innerHTML = '<img src="assets/check-mark.png" width="33" height="33">';
+checkButton.innerHTML = '<img src="assets/check-mark.png" height="33">';
+
+const wrongButton = document.getElementById("WrongButton");
+wrongButton.innerHTML = '<img src="assets/wrong.png" width="33">';
 
 const soundDiv = document.getElementById("answer-buttons");
 const buttonContainer = document.getElementById("button-cont");

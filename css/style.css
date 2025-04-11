@@ -17,7 +17,7 @@
 * {
   margin: 0;
   padding: 0;
-  font-family: "ITC_ Korrina";
+  font-family: "ITC_ Korinna";
 }
 
 body {
@@ -29,8 +29,9 @@ body {
   text-align: center;
   padding-top: 2%;
   padding-bottom: 2%;
-  font-size: 3vw;
-  text-decoration: underline;
+  font-size: 3.5vw;
+  font-weight: bold;
+  text-shadow: 1px 1px 2px black;
 }
 
 #Score {
@@ -95,8 +96,9 @@ input[type="number"]::-webkit-outer-spin-button {
   border: none;
   font-size: 2vw;
   color: white;
-  padding: 1.5%;
-  border-radius: 12px;
+  text-shadow: 1px 1px 2px black;
+  padding: 1%;
+  border-radius: 10%;
   transition-property: filter, transform;
   transition-duration: 250ms;
 }
@@ -110,7 +112,7 @@ input[type="number"]::-webkit-outer-spin-button {
   justify-content: space-evenly;
   grid-template-columns: repeat(6, 1fr);
   padding: 2%;
-  gap: 5px;
+  gap: 2px;
 }
 
 .answer-button {
@@ -119,21 +121,18 @@ input[type="number"]::-webkit-outer-spin-button {
   background-image: var(--gradient);
   background-size: 300%;
   background-position: right;
-
+  font-weight: bold;
+  height: max-content;
   border: none;
   cursor: pointer;
-  font-size: 2.5vw;
-  color: white;
-  padding: 1.5%;
-  padding-top: 2%;
-  padding-bottom: 2%;
-  border-radius: 8px;
+  font-size: 1.5rem;
+  text-shadow: 2px 2px 2px black;
+  color: rgb(229, 255, 0);
+  padding: 0.5rem;
+  border-radius: 1%;
   position: relative;
   transition: transform 250ms ease-in, font-size 250ms, background-position 500ms, opacity 350ms ease-out,
     filter 350ms ease;
-
-  white-space: normal;
-  word-wrap: break-word;
 }
 
 .category-button {
@@ -142,48 +141,110 @@ input[type="number"]::-webkit-outer-spin-button {
   background-image: var(--gradient);
   background-size: 300%;
   background-position: right;
-
+  font-weight: 500;
   border: none;
   cursor: pointer;
   font-size: 2.5vw;
   color: white;
-  padding: 1.5%;
-  padding-top: 2%;
-  padding-bottom: 2%;
-  border-radius: 8px;
+  text-shadow: 2px 2px 2px black;
+  padding: 5.5%;
+  border-radius: 2%;
+  margin-bottom: 2%;
   position: relative;
   transition: transform 250ms ease-in, font-size 250ms, background-position 500ms, opacity 350ms ease-out,
     filter 350ms ease;
+}
 
-  white-space: normal;
-  word-wrap: break-word;
+.modal {
+  display: none;
+  position: fixed;
+  z-index: 999;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  overflow: auto;
+  background-color: rgba(0, 0, 0, 0.5);
+}
+
+.modal-content {
+  position: relative;
+  top: 15vw;
+  background-color: #000000;
+  margin: 15% auto;
+  align-items: end;
+  padding: 20px;
+  border-radius: 4px;
+  width: 33%;
+  color: #ffffff;
+}
+
+.answer-content {
+  display: grid;
+  grid-template-columns: repeat(8, 1fr);
+  grid-gap: 10px;
 }
 
 .check-button {
-  flex: 25%;
-  flex-grow: 0;
   cursor: pointer;
   background-color: #0da032;
   border: none;
   font-size: 2em;
   color: white;
-  padding-left: 2%;
-  padding-right: 2%;
-  border-radius: 100%;
-  transition-property: filter, transform, opacity;
-  transition-duration: 350ms;
-  transition-timing-function: ease-in;
+  border-radius: 50%;
+  aspect-ratio: 1;
+  max-height: 45px;
+  padding-top: 5px;
+  grid-column-start: 1;
+  grid-column-end: 3;
 }
 
-.answer-button.deleted {
-  opacity: 0;
-  filter: blur(10px);
-  transform: scale(1.2);
-  transform: translateY(-1em);
+.wrong-button {
+  cursor: pointer;
+  background-color: #1b1b1b;
+  border: none;
+  font-size: 2em;
+  color: white;
+  border-radius: 50%;
+  aspect-ratio: 1;
+  max-height: 45px;
+  padding-top: 5px;
+  grid-column-start: 3;
+  grid-column-end: 5;
 }
 
-.answer-button:active {
-  filter: brightness(80%);
+.no-answer-button {
+  background-color: var(--dark-blue);
+  background-image: var(--gradient);
+  background-size: 300%;
+  background-position: right;
+  font-weight: bold;
+  border: none;
+  cursor: pointer;
+  font-size: 1.5rem;
+  text-shadow: 2px 2px 2px black;
+  color: rgb(255, 255, 255);
+  padding-top: 2%;
+  border-radius: 5%;
+  grid-column-start: 5;
+  grid-column-end: 9;
+}
+
+.double-button {
+  background-color: var(--dark-blue);
+  background-image: var(--gradient);
+  background-size: 300%;
+  background-position: right;
+  font-weight: bold;
+  border: none;
+  cursor: pointer;
+  font-size: 1.5rem;
+  text-shadow: 2px 2px 2px black;
+  color: rgb(255, 255, 255);
+  padding-top: 2%;
+  border-radius: 5%;
+  grid-column-start: 2;
+  grid-column-end: 8;
 }
 
 .sound-container {
@@ -195,166 +256,14 @@ input[type="number"]::-webkit-outer-spin-button {
   transition: opacity 250ms ease-out;
 }
 
-.unhovered {
-  opacity: 50%;
-  transition: opacity 250ms ease-in;
-}
-
-.loop-button {
-  flex: 25%;
-  flex-grow: 0;
-  cursor: pointer;
-  background-color: rgb(30, 30, 30);
-  border: none;
-  font-size: 2em;
-  color: white;
-  padding-left: 2%;
-  padding-right: 2%;
-  border-radius: 8px;
-  transition-property: filter, transform, opacity;
-  transition-duration: 350ms;
-  transition-timing-function: ease-in;
-}
-
-.loop-button.deleted {
-  opacity: 0;
-  filter: blur(10px);
-  transform: scale(1.2);
-  transform: translateY(-1em);
-}
-
-.loop-button:hover {
-  filter: brightness(200%);
-  transform: scale(1.1);
-}
-
-.loop-button:active {
-  filter: brightness(75%);
-}
-
-.loop-clicked {
-  flex: 25%;
-  flex-grow: 0;
-  cursor: pointer;
-  background-color: rgb(78, 78, 78);
-  border: none;
-  font-size: 2em;
-  color: white;
-  padding-left: 2%;
-  padding-right: 2%;
-  border-radius: 8px;
-  transition-property: filter, transform, opacity;
-  transition-duration: 350ms;
-  transition-timing-function: ease-in;
-}
-
-.loop-clicked.deleted {
-  opacity: 0;
-  filter: blur(10px);
-  transform: scale(1.2);
-  transform: translateY(-1em);
-}
-
-.loop-clicked:hover {
-  filter: brightness(75%);
-  transform: scale(1.1);
-}
-
-.loop-clicked:active {
-  filter: brightness(50%);
-}
-
 img {
   pointer-events: none;
 }
 
-.delete-button {
-  flex: 25%;
-  flex-grow: 0;
-  cursor: pointer;
-  background-color: #1e1e1e;
-  border: none;
-  font-size: 2em;
-  color: white;
-  padding-left: 2%;
-  padding-right: 2%;
-  border-radius: 8px;
-  transition-property: filter, transform, opacity;
-  transition-duration: 350ms;
-  transition-timing-function: ease-in;
-}
-
-.delete-button.deleted {
-  opacity: 0;
-  filter: blur(10px);
-  transform: scale(1.2);
-  transform: translateY(-1em);
-}
-
-.delete-button:hover {
-  filter: brightness(200%);
-  transform: scale(1.1);
-}
-
-.delete-button:active {
-  filter: brightness(75%);
-}
-
-.pen-button {
-  flex: 25%;
-  flex-grow: 0;
-  cursor: pointer;
-  background-color: #1e1e1e;
-  border: none;
-  font-size: 2em;
-  color: white;
-  padding-left: 2%;
-  padding-right: 2%;
-  border-radius: 8px;
-  transition-property: filter, transform, opacity;
-  transition-duration: 350ms;
-  transition-timing-function: ease-in;
-}
-
-.pen-button.deleted {
-  opacity: 0;
-  filter: blur(10px);
-  transform: scale(1.2);
-  transform: translateY(-1em);
-}
-
-.pen-button:hover {
-  filter: brightness(200%);
-  transform: scale(1.1);
-}
-
-.pen-button:active {
-  filter: brightness(75%);
-}
-
-.volume-slider {
-  accent-color: #e798d4;
-  flex: 100%;
-  transition-property: filter, transform, opacity;
-  transition-duration: 350ms;
-  transition-timing-function: ease-in;
-}
-
-.volume-slider.deleted {
-  opacity: 0;
-  filter: blur(10px);
-  transform: scale(1.2);
-  transform: translateY(-1em);
-}
-
-.volume-slider:hover {
-  filter: brightness(110%);
-  transform: scale(1.05);
-}
-
 .main-container {
-  display: block;
-  height: 100%;
+  display: flex;
+  flex-flow: column;
+  height: 500px;
 }
 
 .main-container .menu-container {
@@ -393,29 +302,4 @@ img {
 
 .button-container::-webkit-scrollbar-track {
   background-color: rgba(108, 108, 108, 0);
-}
-
-/* Add this in your CSS */
-.modal {
-  display: none;
-  position: fixed;
-  z-index: 999;
-  left: 0;
-  top: 0;
-  width: 100%;
-  height: 100%;
-  overflow: auto;
-  background-color: rgba(0, 0, 0, 0.5);
-}
-
-.modal-content {
-  position: relative;
-  top: 15vw;
-  background-color: #000000;
-  margin: 15% auto;
-  align-items: end;
-  padding: 20px;
-  border-radius: 4px;
-  width: 33%;
-  color: #ffffff;
 }
