@@ -3,7 +3,7 @@ const { ipcRenderer } = require("electron");
 var fs = require("fs");
 
 // Grabbing HTML elements
-let buttonValue, doubleOn;
+let buttonValue, doubleOn = 1, answerButton;
 
 const scoreText = document.getElementById("Score");
 let scoreValue = 0;
@@ -15,6 +15,8 @@ answerBtns.forEach((btn) =>
     showModal();
     buttonValue = event.target.textContent.substring(1);
     buttonValue = parseInt(buttonValue);
+    console.log(buttonValue);
+    answerButton = btn;
   })
 );
 
@@ -32,7 +34,6 @@ const doubleButton = document.getElementById("DailyDouble");
 
 // Add this to a script tag or your renderer JS file
 const modal = document.getElementById("myModal");
-const closeBtn = document.querySelector(".close-button");
 
 // To show modal
 function showModal() {
@@ -55,6 +56,7 @@ checkButton.addEventListener("click", () => {
   scoreValue = scoreValue + doubleOn * buttonValue;
 
   modal.style.display = "none";
+  answerButton.style.visibility = "hidden";
   doubleButton.className = "double-button";
   doubleOn = 1;
 });
@@ -68,6 +70,7 @@ wrongButton.addEventListener("click", () => {
   scoreValue = scoreValue - doubleOn * buttonValue;
 
   modal.style.display = "none";
+  answerButton.style.visibility = "hidden";
   doubleButton.className = "double-button";
   doubleOn = 1;
 });
@@ -75,10 +78,15 @@ wrongButton.addEventListener("click", () => {
 resetButton.addEventListener("click", () => {
   scoreValue = 0;
   scoreText.textContent = "Score: $0";
+  answerBtns.forEach((btn) => 
+    btn.style.visibility = "visible" );
 })
 
 noAnswerButton.addEventListener("click", () => {
   modal.style.display = "none";
+  answerButton.style.visibility = "hidden";
+  doubleButton.className = "double-button";
+  doubleOn = 1;
 })
 
 doubleButton.addEventListener("click", () => {
