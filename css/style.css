@@ -234,6 +234,26 @@ input[type="number"]::-webkit-outer-spin-button {
   background-color: var(--dark-blue);
   background-image: var(--gradient);
   background-size: 300%;
+  filter: brightness(50%);
+  filter: grayscale(50%);
+  background-position: right;
+  font-weight: bold;
+  border: none;
+  cursor: pointer;
+  font-size: 1.5rem;
+  text-shadow: 2px 2px 2px black;
+  color: rgb(139, 139, 139);
+  padding-top: 2%;
+  border-radius: 5%;
+  grid-column-start: 2;
+  grid-column-end: 8;
+}
+
+.double-clicked {
+  background-color: var(--dark-blue);
+  background-image: var(--gradient);
+  background-size: 300%;
+  filter: brightness(150%);
   background-position: right;
   font-weight: bold;
   border: none;

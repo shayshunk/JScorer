@@ -3,13 +3,13 @@ const { ipcRenderer } = require("electron");
 var fs = require("fs");
 
 // Grabbing HTML elements
-let buttonValue;
+let buttonValue, doubleOn;
 
 const scoreText = document.getElementById("Score");
 let scoreValue = 0;
 
 const answerBtns = document.querySelectorAll(".answer-button");
-console.log(answerBtns);
+
 answerBtns.forEach((btn) =>
   btn.addEventListener("click", (event) => {
     showModal();
@@ -23,6 +23,12 @@ checkButton.innerHTML = '<img src="assets/check-mark.png" height="33">';
 
 const wrongButton = document.getElementById("WrongButton");
 wrongButton.innerHTML = '<img src="assets/wrong.png" width="33">';
+
+const noAnswerButton = document.getElementById("NoAnswer");
+
+const resetButton = document.getElementById("Reset");
+
+const doubleButton = document.getElementById("DailyDouble");
 
 // Add this to a script tag or your renderer JS file
 const modal = document.getElementById("myModal");
@@ -40,31 +46,45 @@ window.addEventListener("click", (event) => {
   }
 });
 
-checkButton.addEventListener("click", (event) => {
+checkButton.addEventListener("click", () => {
   if (scoreValue + buttonValue < 0) {
-    scoreText.textContent = "Score: -$" + Math.abs(scoreValue + buttonValue);
+    scoreText.textContent = "Score: -$" + Math.abs(scoreValue + doubleOn * buttonValue);
   } else {
-    scoreText.textContent = "Score: $" + (scoreValue + buttonValue);
+    scoreText.textContent = "Score: $" + (scoreValue + doubleOn * buttonValue);
   }
-  scoreValue = scoreValue + buttonValue;
-  console.log(scoreValue);
-  console.log(buttonValue);
-  console.log(scoreValue + buttonValue);
+  scoreValue = scoreValue + doubleOn * buttonValue;
+
   modal.style.display = "none";
+  doubleButton.className = "double-button";
+  doubleOn = 1;
 });
 
-wrongButton.addEventListener("click", (event) => {
+wrongButton.addEventListener("click", () => {
   if (scoreValue - buttonValue < 0) {
-    scoreText.textContent = "Score: -$" + Math.abs(scoreValue - buttonValue);
+    scoreText.textContent = "Score: -$" + Math.abs(scoreValue - doubleOn * buttonValue);
   } else {
-    scoreText.textContent = "Score: $" + (scoreValue - buttonValue);
+    scoreText.textContent = "Score: $" + (scoreValue - doubleOn * buttonValue);
   }
-  scoreValue = scoreValue - buttonValue;
-  console.log(scoreValue);
-  console.log(buttonValue);
-  console.log(scoreValue - buttonValue);
+  scoreValue = scoreValue - doubleOn * buttonValue;
+
   modal.style.display = "none";
+  doubleButton.className = "double-button";
+  doubleOn = 1;
 });
+
+resetButton.addEventListener("click", () => {
+  scoreValue = 0;
+  scoreText.textContent = "Score: $0";
+})
+
+noAnswerButton.addEventListener("click", () => {
+  modal.style.display = "none";
+})
+
+doubleButton.addEventListener("click", () => {
+  doubleButton.className = doubleButton.className == "double-clicked" ?  "double-button" : "double-clicked";
+  doubleOn = doubleButton.className == "double-clicked" ?  2 : 1;
+})
 
 // Variables
 let buttonName;
