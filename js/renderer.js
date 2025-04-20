@@ -49,11 +49,11 @@ window.addEventListener("click", (event) => {
 
 checkButton.addEventListener("click", () => {
   if (scoreValue + buttonValue < 0) {
-    scoreText.textContent = "Score: -$" + Math.abs(scoreValue + doubleOn * buttonValue);
+    scoreText.textContent = "Score: -$" + Math.abs(scoreValue + buttonValue);
   } else {
-    scoreText.textContent = "Score: $" + (scoreValue + doubleOn * buttonValue);
+    scoreText.textContent = "Score: $" + (scoreValue + buttonValue); //Removed doubling of score
   }
-  scoreValue = scoreValue + doubleOn * buttonValue;
+  scoreValue = scoreValue + buttonValue;
 
   modal.style.display = "none";
   answerButton.style.visibility = "hidden";
@@ -62,12 +62,14 @@ checkButton.addEventListener("click", () => {
 });
 
 wrongButton.addEventListener("click", () => {
-  if (scoreValue - buttonValue < 0) {
-    scoreText.textContent = "Score: -$" + Math.abs(scoreValue - doubleOn * buttonValue);
-  } else {
-    scoreText.textContent = "Score: $" + (scoreValue - doubleOn * buttonValue);
+  if(doubleOn == 1){ //No deductions for incorrect DD with Coryat scoring
+    if (scoreValue - buttonValue < 0) {
+      scoreText.textContent = "Score: -$" + Math.abs(scoreValue - buttonValue);
+    } else {
+      scoreText.textContent = "Score: $" + (scoreValue - buttonValue); //Removed doubling of score
+    }
+    scoreValue = scoreValue - buttonValue;
   }
-  scoreValue = scoreValue - doubleOn * buttonValue;
 
   modal.style.display = "none";
   answerButton.style.visibility = "hidden";
