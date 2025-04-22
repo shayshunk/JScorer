@@ -8,214 +8,148 @@ let buttonValue, doubleOn = 1, answerButton;
 const scoreText = document.getElementById("Score");
 let scoreValue = 0;
 
-const answerBtns = document.querySelectorAll(".answer-button"); // Gets buttons from main page initially
+const answerBtns = document.querySelectorAll(".answer-button");
 
 answerBtns.forEach((btn) =>
   btn.addEventListener("click", (event) => {
-    // Check if the click came from the main board or the DJ modal content
-    // This check might need refinement depending on how you structure DJ buttons
-    if (event.target.closest('#doubleJeopardyModalContent')) {
-        console.log("Clicked button inside DJ Modal");
-        // Handle DJ button click differently if needed
-        // For now, let's assume it uses the same logic
-    } else {
-        console.log("Clicked button on main board");
-    }
-    showModal(); // Show the original check/wrong modal
+    showModal();
     buttonValue = event.target.textContent.substring(1);
     buttonValue = parseInt(buttonValue);
     console.log(buttonValue);
-    answerButton = btn; // Store the clicked button (could be main or DJ)
+    answerButton = btn;
   })
 );
 
 const checkButton = document.getElementById("CheckButton");
-// checkButton.innerHTML = '<img src="assets/check-mark.png" height="33">'; // Moved to DOMContentLoaded
+checkButton.innerHTML = '<img src="assets/check-mark.png" height="33">';
 
 const wrongButton = document.getElementById("WrongButton");
-// wrongButton.innerHTML = '<img src="assets/wrong.png" width="33">'; // Moved to DOMContentLoaded
+wrongButton.innerHTML = '<img src="assets/wrong.png" width="33">';
 
 const noAnswerButton = document.getElementById("NoAnswer");
+
 const resetButton = document.getElementById("Reset");
+
 const doubleButton = document.getElementById("DailyDouble");
 
-// The original answer modal
+// Add this to a script tag or your renderer JS file
 const modal = document.getElementById("myModal");
 
-// --- Elements for the Double Jeopardy modal ---
+//Loading new Double Jeopardy modal
 const doubleJeopardyModal = document.getElementById('doubleJeopardyModal');
 const doubleJeopardyModalContent = document.getElementById('doubleJeopardyModalContent');
 const openDoubleJeopardyModalBtn = document.getElementById('openDoubleJeopardyModalBtn');
 
-// To show the original modal
+// To show modal
 function showModal() {
-  if(modal) modal.style.display = "block";
+  modal.style.display = "block";
 }
 
-// To hide modals when clicking outside their content area
+// To hide modal
 window.addEventListener("click", (event) => {
   if (event.target === modal) {
-    if(modal) modal.style.display = "none";
-  }
-  // Hide DJ modal if clicked outside
-  if (event.target === doubleJeopardyModal) {
-      hideDoubleJeopardyModal();
+    modal.style.display = "none";
   }
 });
 
-// --- Event listeners for the original modal's buttons ---
-if(checkButton) {
-    checkButton.addEventListener("click", () => {
-      if (scoreValue + buttonValue < 0) {
-        scoreText.textContent = "Score: -$" + Math.abs(scoreValue + buttonValue);
-      } else {
-        scoreText.textContent = "Score: $" + (scoreValue + buttonValue);
-      }
-      scoreValue = scoreValue + buttonValue;
+checkButton.addEventListener("click", () => {
+  if (scoreValue + buttonValue < 0) {
+    scoreText.textContent = "Score: -$" + Math.abs(scoreValue + buttonValue);
+  } else {
+    scoreText.textContent = "Score: $" + (scoreValue + buttonValue); //Removed doubling of score
+  }
+  scoreValue = scoreValue + buttonValue;
 
-      if(modal) modal.style.display = "none";
-      if(answerButton) answerButton.style.visibility = "hidden"; // Hide the specific button clicked (main or DJ)
-      if(doubleButton) doubleButton.className = "double-button";
-      doubleOn = 1;
-    });
-}
+  modal.style.display = "none";
+  answerButton.style.visibility = "hidden";
+  doubleButton.className = "double-button";
+  doubleOn = 1;
+});
 
-if(wrongButton) {
-    wrongButton.addEventListener("click", () => {
-      if(doubleOn == 1){ //No deductions for incorrect DD with Coryat scoring
-        if (scoreValue - buttonValue < 0) {
-          scoreText.textContent = "Score: -$" + Math.abs(scoreValue - buttonValue);
-        } else {
-          scoreText.textContent = "Score: $" + (scoreValue - buttonValue);
-        }
-        scoreValue = scoreValue - buttonValue;
-      }
+wrongButton.addEventListener("click", () => {
+  if(doubleOn == 1){ //No deductions for incorrect DD with Coryat scoring
+    if (scoreValue - buttonValue < 0) {
+      scoreText.textContent = "Score: -$" + Math.abs(scoreValue - buttonValue);
+    } else {
+      scoreText.textContent = "Score: $" + (scoreValue - buttonValue); //Removed doubling of score
+    }
+    scoreValue = scoreValue - buttonValue;
+  }
 
-      if(modal) modal.style.display = "none";
-      if(answerButton) answerButton.style.visibility = "hidden";
-      if(doubleButton) doubleButton.className = "double-button";
-      doubleOn = 1;
-    });
-}
+  modal.style.display = "none";
+  answerButton.style.visibility = "hidden";
+  doubleButton.className = "double-button";
+  doubleOn = 1;
+});
 
-if(resetButton) {
-    resetButton.addEventListener("click", () => {
-      scoreValue = 0;
-      scoreText.textContent = "Score: $0";
-      // Make all potentially hidden buttons visible again
-      // This needs to select buttons from BOTH the main board AND the DJ modal content
-      document.querySelectorAll('#answer-buttons .answer-button, #doubleJeopardyModalContent .answer-button').forEach((btn) => {
-            btn.style.visibility = "visible";
-      });
-       document.querySelectorAll('#answer-buttons .category-button, #doubleJeopardyModalContent .category-button').forEach((btn) => {
-            btn.style.visibility = "visible"; // Also reset category buttons if needed
-      });
-      hideDoubleJeopardyModal(); // Ensure DJ modal is hidden on reset
-      if(modal) modal.style.display = 'none'; // Hide original modal too
-    });
-}
+resetButton.addEventListener("click", () => {
+  scoreValue = 0;
+  scoreText.textContent = "Score: $0";
+  answerBtns.forEach((btn) => 
+    btn.style.visibility = "visible" );
+})
 
-if(noAnswerButton) {
-    noAnswerButton.addEventListener("click", () => {
-      if(modal) modal.style.display = "none";
-      if(answerButton) answerButton.style.visibility = "hidden";
-      if(doubleButton) doubleButton.className = "double-button";
-      doubleOn = 1;
-    });
-}
+noAnswerButton.addEventListener("click", () => {
+  modal.style.display = "none";
+  answerButton.style.visibility = "hidden";
+  doubleButton.className = "double-button";
+  doubleOn = 1;
+})
 
-if(doubleButton) {
-    doubleButton.addEventListener("click", () => {
-      doubleButton.className = doubleButton.className == "double-clicked" ?  "double-button" : "double-clicked";
-      doubleOn = doubleButton.className == "double-clicked" ?  2 : 1;
-    });
-}
+doubleButton.addEventListener("click", () => {
+  doubleButton.className = doubleButton.className == "double-clicked" ?  "double-button" : "double-clicked";
+  doubleOn = doubleButton.className == "double-clicked" ?  2 : 1;
+})
 
-// --- Functions and Listeners for Double Jeopardy Modal ---
-
+//Show the Double Jeopardy page modal
 function showDoubleJeopardyModal(){
-  console.log("Attempting to show Double Jeopardy modal...");
-  if (!doubleJeopardyModal || !doubleJeopardyModalContent) {
-    console.error("Double Jeopardy modal elements not found!");
+  if (!doubleJeopardyModal || !doubleJeopardyModalContent) { //Errors an' stuff
+    console.error("Double Jeopardy elements not found.");
     return;
   }
 
-  // Show loading state
-  doubleJeopardyModalContent.innerHTML = '<p>Loading...</p>';
-  doubleJeopardyModal.style.display = 'block'; // Show modal container
-
-  // Fetch the content
-  fetch('./doublejeopardy.html') // Path relative to index.html
+  fetch('./doublejeopardy.html')
     .then(response => {
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
-      return response.text();
+      return response.text(); //Error throwing HTML dump
     })
     .then(html => {
-      // Inject the loaded HTML
+      //Take the HTML from the file
       doubleJeopardyModalContent.innerHTML = html;
 
-      // *** Add event listener for the close button AFTER loading ***
-      // *** Make sure the ID here matches the ID in doublejeopardy.html ***
-      const closeBtn = doubleJeopardyModalContent.querySelector('#closeDoubleJeopardyModalBtn');
+      const closeBtn = doubleJeopardyModalContent.querySelector('#closeDoubleJeopardyModalBtn'); //Add button/listener after loading content
       if (closeBtn) {
         closeBtn.addEventListener('click', hideDoubleJeopardyModal);
-        console.log("Close button listener added.");
-      } else {
-        // THIS IS WHERE YOUR ERROR WAS LIKELY TRIGGERED
-        console.error("Close button with ID 'closeDoubleJeopardyModalBtn' not found within loaded modal content.");
-      }
-
-      // *** Add listeners for the NEW answer buttons inside the modal ***
-      const djAnswerBtns = doubleJeopardyModalContent.querySelectorAll(".answer-button");
-      djAnswerBtns.forEach((btn) => {
-          btn.addEventListener("click", (event) => {
-              console.log("Clicked button inside DJ Modal (listener added after load)");
-              showModal(); // Show the original check/wrong modal
-              buttonValue = event.target.textContent.substring(1);
-              buttonValue = parseInt(buttonValue);
-              console.log(buttonValue);
-              answerButton = btn; // Store the clicked DJ button
-          });
-      });
-       console.log(`Added listeners to ${djAnswerBtns.length} DJ answer buttons.`);
-
-
+    } else {
+        console.warn("Close button not found within loaded modal content.");
+    }
     })
-    .catch(error => {
-        console.error('Error loading Double Jeopardy modal content:', error);
-        doubleJeopardyModalContent.innerHTML = '<p>Error loading content. Please try again.</p><button id="closeDoubleJeopardyModalBtnError" class="primary-button">Close</button>';
-        const closeBtnError = doubleJeopardyModalContent.querySelector('#closeDoubleJeopardyModalBtnError');
-        if(closeBtnError) closeBtnError.addEventListener('click', hideDoubleJeopardyModal);
-    });
+
 }
 
 function hideDoubleJeopardyModal() {
   console.log("Hiding Double Jeopardy modal");
   if (doubleJeopardyModal) doubleJeopardyModal.style.display = 'none';
-  // Optional: Clear content when hiding?
-  // if (doubleJeopardyModalContent) doubleJeopardyModalContent.innerHTML = '';
 }
 
-// Listener for the button that OPENS the DJ modal
+// Listener for the button that OPENS the new modal
 if (openDoubleJeopardyModalBtn) {
   openDoubleJeopardyModalBtn.addEventListener('click', showDoubleJeopardyModal);
 } else {
   console.error("Button with ID 'openDoubleJeopardyModalBtn' not found.");
 }
 
-// --- DOMContentLoaded ---
+// --- Ensure Check/Wrong icons load and modals start hidden ---
 document.addEventListener('DOMContentLoaded', () => {
-  // Set icons for original modal buttons
+  const checkButton = document.getElementById("CheckButton");
+  const wrongButton = document.getElementById("WrongButton");
   if(checkButton) checkButton.innerHTML = '<img src="assets/check-mark.png" height="33">';
   if(wrongButton) wrongButton.innerHTML = '<img src="assets/wrong.png" width="33">';
-
-  // Ensure modals start hidden
   if (modal) modal.style.display = 'none';
-  if (doubleJeopardyModal) doubleJeopardyModal.style.display = 'none'; // Make sure DJ modal is hidden too
+  if (doubleJeopardyModal) doubleJeopardyModal.style.display = 'none';
 });
-
 
 // Variables
 let buttonName;
@@ -673,4 +607,3 @@ var buttonList = [],
 function answer() {
   let childWindow = window.open("html/input.html", "width=100,height=100,modal");
 }
-

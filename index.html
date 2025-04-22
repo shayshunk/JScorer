@@ -5,7 +5,10 @@
     <link href="./css/style.css" rel="stylesheet" />
     <meta charset="UTF-8" />
     <!-- https://developer.mozilla.org/en-US/docs/Web/HTTP/CSP -->
-    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'" />
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="default-src 'self'; script-src 'self'"
+    />
     <title>Soundboard</title>
   </head>
 
@@ -17,6 +20,13 @@
         </div>
         <div class="primary-buttons">
           <button type="button" class="primary-button" id="Undo">UNDO</button>
+          <button
+            type="button"
+            class="primary-button"
+            id="openDoubleJeopardyModalBtn"
+          >
+            DOUBLE JEOPARDY
+          </button>
           <button type="button" class="primary-button" id="Reset">RESET</button>
           <p id="Score">Score: $0</p>
         </div>
@@ -67,11 +77,26 @@
     <div id="myModal" class="modal">
       <div class="modal-content">
         <div class="answer-content">
-          <button type="button" class="check-button" id="CheckButton">Hi</button>
-          <button type="button" class="wrong-button" id="WrongButton">Hi</button>
-          <button type="button" class="no-answer-button" id="NoAnswer">No Answer</button>
-          <button type="button" class="double-button" id="DailyDouble">Daily Double</button>
+          <button type="button" class="check-button" id="CheckButton">
+            Hi
+          </button>
+          <button type="button" class="wrong-button" id="WrongButton">
+            Hi
+          </button>
+          <button type="button" class="no-answer-button" id="NoAnswer">
+            No Answer
+          </button>
+          <button type="button" class="double-button" id="DailyDouble">
+            Daily Double
+          </button>
         </div>
+      </div>
+    </div>
+
+    <!-- Double Jeopardy modal display-->
+    <div id="doubleJeopardyModal" class="modal">
+      <div class="modal-content" id="doubleJeopardyModalContent">
+        <p>Loading...</p>
       </div>
     </div>
 
