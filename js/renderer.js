@@ -2,6 +2,9 @@
 const { ipcRenderer } = require("electron");
 var fs = require("fs");
 
+// Get base score value
+let base = 200;
+
 // Grabbing HTML elements
 let buttonValue,
   doubleOn = false,
@@ -14,13 +17,11 @@ let singleJeopardyData = [],
   doubleJeopardyData = [];
 
 const scoreText = document.getElementById("Score");
-
 const answerBtns = document.querySelectorAll(".answer-button"); // Gets buttons from main page initially
 
 answerBtns.forEach((btn) => {
   // Assigning button ids
   btn.id = counter;
-  console.log(btn.id);
   counter++;
 
   // Intializing data array
@@ -48,10 +49,12 @@ answerBtns.forEach((btn) => {
     showModal(); // Show the original check/wrong modal
     buttonValue = event.target.textContent.substring(1);
     buttonValue = parseInt(buttonValue);
-    console.log(buttonValue);
     answerButton = btn; // Store the clicked button (could be main or DJ)
   });
 });
+
+// Loading
+loadFile();
 
 const checkButton = document.getElementById("CheckButton");
 // checkButton.innerHTML = '<img src="assets/check-mark.png" height="33">'; // Moved to DOMContentLoaded
@@ -68,6 +71,81 @@ const modal = document.getElementById("myModal");
 
 // --- Elements for the Double Jeopardy modal ---
 const openDoubleJeopardyBtn = document.getElementById("openDoubleJeopardyBtn");
+
+// Load most recent file
+async function loadFile() {
+  await loadSingleJeopardyFile();
+  await loadDoubleJeopardyFile();
+}
+
+async function updateScore() {
+  // Updating score
+  scoreText.textContent = "Score: $" + scoreValue;
+}
+
+async function loadSingleJeopardyFile() {
+  if (fs.existsSync("SingleJeopardyData.txt")) {
+    // Converting txt to JSON
+    fs.readFile("SingleJeopardyData.txt", "utf8", (err, jeopardyData) => {
+      if (err) {
+        console.log(err);
+        return;
+      }
+
+      // Grabbing data
+      const data = JSON.parse(jeopardyData);
+
+      // Iterate through buttons
+      data.forEach((clue, index) => {
+        // Updating array
+        singleJeopardyData[index].answer = clue.answer;
+        singleJeopardyData[index].double = clue.double;
+
+        if (clue.answer != 0) {
+          button = document.getElementById(index);
+          button.style.visibility = "hidden";
+
+          if (clue.answer == 2) {
+            scoreValue += (Math.floor(index / 6) + 1) * base;
+          } else if (clue.answer == 3 && clue.double == false) {
+            scoreValue -= (Math.floor(index / 6) + 1) * base;
+          }
+        }
+      });
+      updateScore();
+    });
+  }
+}
+
+async function loadDoubleJeopardyFile() {
+  if (fs.existsSync("DoubleJeopardyData.txt")) {
+    // Converting txt to JSON
+    fs.readFile("DoubleJeopardyData.txt", "utf8", (err, jeopardyData) => {
+      if (err) {
+        console.log(err);
+        return;
+      }
+
+      // Grabbing data
+      const data = JSON.parse(jeopardyData);
+
+      // Iterate through buttons
+      data.forEach((clue, index) => {
+        doubleJeopardyData[index].answer = clue.answer;
+        doubleJeopardyData[index].double = clue.double;
+
+        if (clue.answer != 0) {
+          if (clue.answer == 2) {
+            scoreValue += (Math.floor(index / 6) + 1) * base * 2;
+          } else if (clue.answer == 3 && clue.double == false) {
+            scoreValue -= (Math.floor(index / 6) + 1) * base * 2;
+          }
+        }
+      });
+      updateScore();
+    });
+  }
+}
 
 // To show the original modal
 function showModal() {
