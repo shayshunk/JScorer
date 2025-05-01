@@ -4,16 +4,37 @@ var fs = require("fs");
 
 // Grabbing HTML elements
 let buttonValue,
-  doubleOn = 1,
+  doubleOn = false,
   answerButton,
   singleJeopardy = true;
 
+let scoreValue = 0,
+  counter = 0;
+let singleJeopardyData = [],
+  doubleJeopardyData = [];
+
 const scoreText = document.getElementById("Score");
-let scoreValue = 0;
 
 const answerBtns = document.querySelectorAll(".answer-button"); // Gets buttons from main page initially
 
-answerBtns.forEach((btn) =>
+answerBtns.forEach((btn) => {
+  // Assigning button ids
+  btn.id = counter;
+  console.log(btn.id);
+  counter++;
+
+  // Intializing data array
+  singleJeopardyData.push({
+    answer: 0,
+    double: false,
+  });
+
+  doubleJeopardyData.push({
+    answer: 0,
+    double: false,
+  });
+
+  // On click
   btn.addEventListener("click", (event) => {
     // Check if the click came from the main board or the DJ modal content
     // This check might need refinement depending on how you structure DJ buttons
@@ -29,8 +50,8 @@ answerBtns.forEach((btn) =>
     buttonValue = parseInt(buttonValue);
     console.log(buttonValue);
     answerButton = btn; // Store the clicked button (could be main or DJ)
-  })
-);
+  });
+});
 
 const checkButton = document.getElementById("CheckButton");
 // checkButton.innerHTML = '<img src="assets/check-mark.png" height="33">'; // Moved to DOMContentLoaded
@@ -71,16 +92,34 @@ if (checkButton) {
     }
     scoreValue = scoreValue + buttonValue;
 
-    if (modal) modal.style.display = "none";
-    if (answerButton) answerButton.style.visibility = "hidden"; // Hide the specific button clicked (main or DJ)
-    if (doubleButton) doubleButton.className = "double-button";
-    doubleOn = 1;
+    // Updating array
+    if (singleJeopardy) {
+      singleJeopardyData[answerButton.id].answer = 2;
+      singleJeopardyData[answerButton.id].double = doubleOn;
+    } else {
+      doubleJeopardyData[answerButton.id].answer = 2;
+      doubleJeopardyData[answerButton.id].double = doubleOn;
+    }
+
+    if (modal) {
+      modal.style.display = "none";
+    }
+    if (answerButton) {
+      answerButton.style.visibility = "hidden"; // Hide the specific button clicked (main or DJ)
+    }
+    if (doubleButton) {
+      doubleButton.className = "double-button";
+    }
+    doubleOn = false;
+
+    // Saving
+    saveFile();
   });
 }
 
 if (wrongButton) {
   wrongButton.addEventListener("click", () => {
-    if (doubleOn == 1) {
+    if (doubleOn === false) {
       //No deductions for incorrect DD with Coryat scoring
       if (scoreValue - buttonValue < 0) {
         scoreText.textContent =
@@ -91,10 +130,55 @@ if (wrongButton) {
       scoreValue = scoreValue - buttonValue;
     }
 
-    if (modal) modal.style.display = "none";
-    if (answerButton) answerButton.style.visibility = "hidden";
-    if (doubleButton) doubleButton.className = "double-button";
-    doubleOn = 1;
+    // Updating array
+    if (singleJeopardy) {
+      singleJeopardyData[answerButton.id].answer = 3;
+      singleJeopardyData[answerButton.id].double = doubleOn;
+    } else {
+      doubleJeopardyData[answerButton.id].answer = 3;
+      doubleJeopardyData[answerButton.id].double = doubleOn;
+    }
+
+    if (modal) {
+      modal.style.display = "none";
+    }
+    if (answerButton) {
+      answerButton.style.visibility = "hidden";
+    }
+    if (doubleButton) {
+      doubleButton.className = "double-button";
+    }
+    doubleOn = false;
+
+    // Saving
+    saveFile();
+  });
+}
+
+if (noAnswerButton) {
+  noAnswerButton.addEventListener("click", () => {
+    // Updating array
+    if (singleJeopardy) {
+      singleJeopardyData[answerButton.id].answer = 1;
+      singleJeopardyData[answerButton.id].double = doubleOn;
+    } else {
+      doubleJeopardyData[answerButton.id].answer = 1;
+      doubleJeopardyData[answerButton.id].double = doubleOn;
+    }
+
+    if (modal) {
+      modal.style.display = "none";
+    }
+    if (answerButton) {
+      answerButton.style.visibility = "hidden";
+    }
+    if (doubleButton) {
+      doubleButton.className = "double-button";
+    }
+    doubleOn = false;
+
+    // Saving
+    saveFile();
   });
 }
 
@@ -110,16 +194,16 @@ if (resetButton) {
     }
 
     // Show all buttons
-    answerBtns.forEach((btn) => (btn.style.visibility = "visible"));
-  });
-}
+    answerBtns.forEach((btn) => {
+      btn.style.visibility = "visible";
+      singleJeopardyData[btn.id].answer = 0;
+      singleJeopardyData[btn.id].double = false;
+      doubleJeopardyData[btn.id].answer = 0;
+      doubleJeopardyData[btn.id].double = false;
+    });
 
-if (noAnswerButton) {
-  noAnswerButton.addEventListener("click", () => {
-    if (modal) modal.style.display = "none";
-    if (answerButton) answerButton.style.visibility = "hidden";
-    if (doubleButton) doubleButton.className = "double-button";
-    doubleOn = 1;
+    // Saving
+    saveFile();
   });
 }
 
@@ -129,7 +213,7 @@ if (doubleButton) {
       doubleButton.className == "double-clicked"
         ? "double-button"
         : "double-clicked";
-    doubleOn = doubleButton.className == "double-clicked" ? 2 : 1;
+    doubleOn = doubleButton.className == "double-clicked" ? true : false;
   });
 }
 
@@ -144,8 +228,20 @@ function showDoubleJeopardy() {
 
     if (singleJeopardy) {
       btn.textContent = "$" + value * 2;
+      // Checking if button already clicked in other round
+      if (doubleJeopardyData[btn.id].answer == 0) {
+        btn.style.visibility = "visible";
+      } else {
+        btn.style.visibility = "hidden";
+      }
     } else {
       btn.textContent = "$" + value * 0.5;
+      // Checking if button already clicked in other round
+      if (singleJeopardyData[btn.id].answer == 0) {
+        btn.style.visibility = "visible";
+      } else {
+        btn.style.visibility = "hidden";
+      }
     }
   });
 
@@ -157,6 +253,24 @@ function showDoubleJeopardy() {
 
   // Flip between single and double jeopardy
   singleJeopardy = !singleJeopardy;
+}
+
+function saveFile() {
+  // JSONify
+  const singleJSON = JSON.stringify(singleJeopardyData);
+  const doubleJSON = JSON.stringify(doubleJeopardyData);
+
+  // Save to file
+  fs.writeFile("SingleJeopardyData.txt", singleJSON, function (err) {
+    if (err) {
+      console.log(err);
+    }
+  });
+  fs.writeFile("DoubleJeopardyData.txt", doubleJSON, function (err) {
+    if (err) {
+      console.log(err);
+    }
+  });
 }
 
 // Listener for the button that OPENS the DJ modal
