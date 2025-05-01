@@ -108,6 +108,9 @@ if (resetButton) {
     if (!singleJeopardy) {
       showDoubleJeopardy();
     }
+
+    // Show all buttons
+    answerBtns.forEach((btn) => (btn.style.visibility = "visible"));
   });
 }
 
