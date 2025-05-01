@@ -3,7 +3,10 @@ const { ipcRenderer } = require("electron");
 var fs = require("fs");
 
 // Grabbing HTML elements
-let buttonValue, doubleOn = 1, answerButton;
+let buttonValue,
+  doubleOn = 1,
+  answerButton,
+  singleJeopardy = true;
 
 const scoreText = document.getElementById("Score");
 let scoreValue = 0;
@@ -14,12 +17,12 @@ answerBtns.forEach((btn) =>
   btn.addEventListener("click", (event) => {
     // Check if the click came from the main board or the DJ modal content
     // This check might need refinement depending on how you structure DJ buttons
-    if (event.target.closest('#doubleJeopardyModalContent')) {
-        console.log("Clicked button inside DJ Modal");
-        // Handle DJ button click differently if needed
-        // For now, let's assume it uses the same logic
+    if (event.target.closest("#doubleJeopardyModalContent")) {
+      console.log("Clicked button inside DJ Modal");
+      // Handle DJ button click differently if needed
+      // For now, let's assume it uses the same logic
     } else {
-        console.log("Clicked button on main board");
+      console.log("Clicked button on main board");
     }
     showModal(); // Show the original check/wrong modal
     buttonValue = event.target.textContent.substring(1);
@@ -43,634 +46,132 @@ const doubleButton = document.getElementById("DailyDouble");
 const modal = document.getElementById("myModal");
 
 // --- Elements for the Double Jeopardy modal ---
-const doubleJeopardyModal = document.getElementById('doubleJeopardyModal');
-const doubleJeopardyModalContent = document.getElementById('doubleJeopardyModalContent');
-const openDoubleJeopardyModalBtn = document.getElementById('openDoubleJeopardyModalBtn');
+const openDoubleJeopardyBtn = document.getElementById("openDoubleJeopardyBtn");
 
 // To show the original modal
 function showModal() {
-  if(modal) modal.style.display = "block";
+  if (modal) {
+    modal.style.display = "block";
+  }
 }
 
-// To hide modals when clicking outside their content area
 window.addEventListener("click", (event) => {
   if (event.target === modal) {
-    if(modal) modal.style.display = "none";
-  }
-  // Hide DJ modal if clicked outside
-  if (event.target === doubleJeopardyModal) {
-      hideDoubleJeopardyModal();
+    modal.style.display = "none";
   }
 });
 
 // --- Event listeners for the original modal's buttons ---
-if(checkButton) {
-    checkButton.addEventListener("click", () => {
-      if (scoreValue + buttonValue < 0) {
-        scoreText.textContent = "Score: -$" + Math.abs(scoreValue + buttonValue);
+if (checkButton) {
+  checkButton.addEventListener("click", () => {
+    if (scoreValue + buttonValue < 0) {
+      scoreText.textContent = "Score: -$" + Math.abs(scoreValue + buttonValue);
+    } else {
+      scoreText.textContent = "Score: $" + (scoreValue + buttonValue);
+    }
+    scoreValue = scoreValue + buttonValue;
+
+    if (modal) modal.style.display = "none";
+    if (answerButton) answerButton.style.visibility = "hidden"; // Hide the specific button clicked (main or DJ)
+    if (doubleButton) doubleButton.className = "double-button";
+    doubleOn = 1;
+  });
+}
+
+if (wrongButton) {
+  wrongButton.addEventListener("click", () => {
+    if (doubleOn == 1) {
+      //No deductions for incorrect DD with Coryat scoring
+      if (scoreValue - buttonValue < 0) {
+        scoreText.textContent =
+          "Score: -$" + Math.abs(scoreValue - buttonValue);
       } else {
-        scoreText.textContent = "Score: $" + (scoreValue + buttonValue);
+        scoreText.textContent = "Score: $" + (scoreValue - buttonValue);
       }
-      scoreValue = scoreValue + buttonValue;
+      scoreValue = scoreValue - buttonValue;
+    }
 
-      if(modal) modal.style.display = "none";
-      if(answerButton) answerButton.style.visibility = "hidden"; // Hide the specific button clicked (main or DJ)
-      if(doubleButton) doubleButton.className = "double-button";
-      doubleOn = 1;
-    });
+    if (modal) modal.style.display = "none";
+    if (answerButton) answerButton.style.visibility = "hidden";
+    if (doubleButton) doubleButton.className = "double-button";
+    doubleOn = 1;
+  });
 }
 
-if(wrongButton) {
-    wrongButton.addEventListener("click", () => {
-      if(doubleOn == 1){ //No deductions for incorrect DD with Coryat scoring
-        if (scoreValue - buttonValue < 0) {
-          scoreText.textContent = "Score: -$" + Math.abs(scoreValue - buttonValue);
-        } else {
-          scoreText.textContent = "Score: $" + (scoreValue - buttonValue);
-        }
-        scoreValue = scoreValue - buttonValue;
-      }
+if (resetButton) {
+  resetButton.addEventListener("click", () => {
+    // Reset score
+    scoreValue = 0;
+    scoreText.textContent = "Score: $0";
 
-      if(modal) modal.style.display = "none";
-      if(answerButton) answerButton.style.visibility = "hidden";
-      if(doubleButton) doubleButton.className = "double-button";
-      doubleOn = 1;
-    });
+    // Go back to single jeopardy
+    if (!singleJeopardy) {
+      showDoubleJeopardy();
+    }
+  });
 }
 
-if(resetButton) {
-    resetButton.addEventListener("click", () => {
-      scoreValue = 0;
-      scoreText.textContent = "Score: $0";
-      // Make all potentially hidden buttons visible again
-      // This needs to select buttons from BOTH the main board AND the DJ modal content
-      document.querySelectorAll('#answer-buttons .answer-button, #doubleJeopardyModalContent .answer-button').forEach((btn) => {
-            btn.style.visibility = "visible";
-      });
-       document.querySelectorAll('#answer-buttons .category-button, #doubleJeopardyModalContent .category-button').forEach((btn) => {
-            btn.style.visibility = "visible"; // Also reset category buttons if needed
-      });
-      hideDoubleJeopardyModal(); // Ensure DJ modal is hidden on reset
-      if(modal) modal.style.display = 'none'; // Hide original modal too
-    });
+if (noAnswerButton) {
+  noAnswerButton.addEventListener("click", () => {
+    if (modal) modal.style.display = "none";
+    if (answerButton) answerButton.style.visibility = "hidden";
+    if (doubleButton) doubleButton.className = "double-button";
+    doubleOn = 1;
+  });
 }
 
-if(noAnswerButton) {
-    noAnswerButton.addEventListener("click", () => {
-      if(modal) modal.style.display = "none";
-      if(answerButton) answerButton.style.visibility = "hidden";
-      if(doubleButton) doubleButton.className = "double-button";
-      doubleOn = 1;
-    });
-}
-
-if(doubleButton) {
-    doubleButton.addEventListener("click", () => {
-      doubleButton.className = doubleButton.className == "double-clicked" ?  "double-button" : "double-clicked";
-      doubleOn = doubleButton.className == "double-clicked" ?  2 : 1;
-    });
+if (doubleButton) {
+  doubleButton.addEventListener("click", () => {
+    doubleButton.className =
+      doubleButton.className == "double-clicked"
+        ? "double-button"
+        : "double-clicked";
+    doubleOn = doubleButton.className == "double-clicked" ? 2 : 1;
+  });
 }
 
 // --- Functions and Listeners for Double Jeopardy Modal ---
 
-function showDoubleJeopardyModal(){
-  console.log("Attempting to show Double Jeopardy modal...");
-  if (!doubleJeopardyModal || !doubleJeopardyModalContent) {
-    console.error("Double Jeopardy modal elements not found!");
-    return;
+function showDoubleJeopardy() {
+  // Check whether you're in single or double jeopardy
+  answerBtns.forEach((btn) => {
+    // Getting button value
+    let value = btn.textContent;
+    value = parseInt(value.slice(1));
+
+    if (singleJeopardy) {
+      btn.textContent = "$" + value * 2;
+    } else {
+      btn.textContent = "$" + value * 0.5;
+    }
+  });
+
+  if (!singleJeopardy) {
+    openDoubleJeopardyBtn.textContent = "DOUBLE JEOPARDY";
+  } else {
+    openDoubleJeopardyBtn.textContent = "JEOPARDY ROUND";
   }
 
-  // Show loading state
-  doubleJeopardyModalContent.innerHTML = '<p>Loading...</p>';
-  doubleJeopardyModal.style.display = 'block'; // Show modal container
-
-  // Fetch the content
-  fetch('./doublejeopardy.html') // Path relative to index.html
-    .then(response => {
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-      return response.text();
-    })
-    .then(html => {
-      // Inject the loaded HTML
-      doubleJeopardyModalContent.innerHTML = html;
-
-      // *** Add event listener for the close button AFTER loading ***
-      // *** Make sure the ID here matches the ID in doublejeopardy.html ***
-      const closeBtn = doubleJeopardyModalContent.querySelector('#closeDoubleJeopardyModalBtn');
-      if (closeBtn) {
-        closeBtn.addEventListener('click', hideDoubleJeopardyModal);
-        console.log("Close button listener added.");
-      } else {
-        // THIS IS WHERE YOUR ERROR WAS LIKELY TRIGGERED
-        console.error("Close button with ID 'closeDoubleJeopardyModalBtn' not found within loaded modal content.");
-      }
-
-      // *** Add listeners for the NEW answer buttons inside the modal ***
-      const djAnswerBtns = doubleJeopardyModalContent.querySelectorAll(".answer-button");
-      djAnswerBtns.forEach((btn) => {
-          btn.addEventListener("click", (event) => {
-              console.log("Clicked button inside DJ Modal (listener added after load)");
-              showModal(); // Show the original check/wrong modal
-              buttonValue = event.target.textContent.substring(1);
-              buttonValue = parseInt(buttonValue);
-              console.log(buttonValue);
-              answerButton = btn; // Store the clicked DJ button
-          });
-      });
-       console.log(`Added listeners to ${djAnswerBtns.length} DJ answer buttons.`);
-
-
-    })
-    .catch(error => {
-        console.error('Error loading Double Jeopardy modal content:', error);
-        doubleJeopardyModalContent.innerHTML = '<p>Error loading content. Please try again.</p><button id="closeDoubleJeopardyModalBtnError" class="primary-button">Close</button>';
-        const closeBtnError = doubleJeopardyModalContent.querySelector('#closeDoubleJeopardyModalBtnError');
-        if(closeBtnError) closeBtnError.addEventListener('click', hideDoubleJeopardyModal);
-    });
-}
-
-function hideDoubleJeopardyModal() {
-  console.log("Hiding Double Jeopardy modal");
-  if (doubleJeopardyModal) doubleJeopardyModal.style.display = 'none';
-  // Optional: Clear content when hiding?
-  // if (doubleJeopardyModalContent) doubleJeopardyModalContent.innerHTML = '';
+  // Flip between single and double jeopardy
+  singleJeopardy = !singleJeopardy;
 }
 
 // Listener for the button that OPENS the DJ modal
-if (openDoubleJeopardyModalBtn) {
-  openDoubleJeopardyModalBtn.addEventListener('click', showDoubleJeopardyModal);
+if (openDoubleJeopardyBtn) {
+  openDoubleJeopardyBtn.addEventListener("click", showDoubleJeopardy);
 } else {
-  console.error("Button with ID 'openDoubleJeopardyModalBtn' not found.");
+  console.error("Button with ID 'openDoubleJeopardyBtn' not found.");
 }
 
 // --- DOMContentLoaded ---
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener("DOMContentLoaded", () => {
   // Set icons for original modal buttons
-  if(checkButton) checkButton.innerHTML = '<img src="assets/check-mark.png" height="33">';
-  if(wrongButton) wrongButton.innerHTML = '<img src="assets/wrong.png" width="33">';
+  if (checkButton)
+    checkButton.innerHTML = '<img src="assets/check-mark.png" height="33">';
+  if (wrongButton)
+    wrongButton.innerHTML = '<img src="assets/wrong.png" width="33">';
 
   // Ensure modals start hidden
-  if (modal) modal.style.display = 'none';
-  if (doubleJeopardyModal) doubleJeopardyModal.style.display = 'none'; // Make sure DJ modal is hidden too
+  if (modal) modal.style.display = "none";
+  if (doubleJeopardyModal) doubleJeopardyModal.style.display = "none"; // Make sure DJ modal is hidden too
 });
-
-
-// Variables
-let buttonName;
-var buttonList = [],
-  userData = [];
-
-// // Updating master volume
-// masterVolumeSlider.addEventListener("input", () => {
-//   const volume = masterVolumeSlider.value / 100;
-
-//   // Updating all sound volumes
-//   for (let i = 0; i < buttonList.length; i++) {
-//     const sound = buttonList[i].audioFile;
-//     const localVolume = buttonList[i].volumeSlider.value / 100;
-
-//     console.log("Local volume of ", i, localVolume);
-
-//     sound.volume = localVolume * volume;
-//   }
-
-//   // Updating options file
-//   saveFile();
-// });
-
-// // Updating number of columns
-// columnInput.addEventListener("input", () => {
-//   const columns = columnInput.value;
-
-//   // Changing grid layout
-//   soundDiv.style.gridTemplateColumns = `repeat(${columns}, 1fr)`;
-
-//   // Updating options file
-//   saveFile();
-// });
-
-// // Checking if data file exists and loading sounds
-// if (fs.existsSync("ButtonData.txt")) {
-//   // Converting text back to JSON
-//   fs.readFile("ButtonData.txt", "utf8", (err, jsonData) => {
-//     if (err) {
-//       console.log(err);
-//       return;
-//     }
-
-//     const loadedSounds = JSON.parse(jsonData);
-
-//     // Iterating through loaded sounds
-//     for (let i = 0; i < loadedSounds.length; i++) {
-//       answer(loadedSounds[i].path, loadedSounds[i].name, loadedSounds[i].vol, loadedSounds[i].loopOn);
-//     }
-//   });
-// }
-
-// // Checking if options file exists
-// if (fs.existsSync("UserData.txt")) {
-//   // Converting back to JSOn
-//   fs.readFile("UserData.txt", "utf8", (err, userOptions) => {
-//     if (err) {
-//       console.log(err);
-//       return;
-//     }
-
-//     // Grabbing data
-//     const options = JSON.parse(userOptions);
-//     const columns = options.columns;
-//     const mainVolume = options.mainVolume;
-
-//     // Updating
-//     columnInput.value = columns;
-//     soundDiv.style.gridTemplateColumns = `repeat(${columns}, 1fr)`;
-//     masterVolumeSlider.value = mainVolume;
-//   });
-// }
-
-// // Function to add sound button group
-// async function answer(path = null, name = null, vol = null, loopOn = false) {
-//   // Checking if passing in loaded sound
-//   if (path === null) {
-//     soundInformation = await openDialog();
-//     filePath = soundInformation[0];
-//   } else {
-//     filePath = path;
-//   }
-
-//   // Makes sure name dialog isn't loaded if no file path
-//   if (filePath == undefined) {
-//     return;
-//   }
-
-//   // Adding button once path is set
-//   await addButton(name, vol, loopOn);
-// }
-
-// // Prompting file dialog
-// async function openDialog() {
-//   const soundInformation = await ipcRenderer.invoke("open-dialog");
-//   return soundInformation;
-// }
-
-// // Opening modal window
-// async function openNewWindow() {
-//   return new Promise(function (resolve, reject) {
-//     let childWindow = window.open("html/input.html", "width=100,height=100,modal");
-//     childWindow.onload = () => {
-//       resolve(childWindow);
-//     };
-//   });
-// }
-
-// // Getting button name from modal window
-// async function getFormValue(defaultName = null) {
-//   let childWindow = await openNewWindow();
-//   childWindow.resizeTo(500, 300);
-//   let childDocument = childWindow.document;
-
-//   return new Promise(function (resolve, reject) {
-//     let form = childDocument.getElementById("submitForm");
-//     let inputForm = childDocument.getElementById("inputForm");
-
-//     if (defaultName != null) {
-//       inputForm.value = defaultName;
-//     }
-
-//     form.addEventListener("submit", function () {
-//       buttonName = inputForm.value;
-//       childWindow.close();
-//       resolve(buttonName);
-//     });
-//   });
-// }
-
-// async function addButton(name, vol, loopOn) {
-//   // Checking if preloaded sounds exist
-//   if (name === null) {
-//     buttonName = await getFormValue();
-//   } else {
-//     buttonName = name;
-//   }
-
-//   // Creating elements
-
-//   // Creating div container
-//   const container = document.createElement("div");
-//   container.classList.add("sound-container");
-//   container.id = `${buttonList.length}`;
-//   container.style.order = buttonList.length;
-//   container.addEventListener("mouseover", (e) => hoverEffect(e));
-//   container.addEventListener("mouseout", () => unhoverEffect());
-//   soundDiv.appendChild(container);
-
-//   // Creating sound button
-//   const newButton = document.createElement("button");
-//   newButton.classList.add("answer-button");
-//   newButton.textContent = `${buttonName}`;
-//   newButton.addEventListener("click", (e) => playSound(e));
-//   newButton.addEventListener("mouseover", (e) => hoverEffect(e));
-//   newButton.addEventListener("mouseout", () => unhoverEffect());
-//   container.appendChild(newButton);
-
-//   // Associating audio object with each sound
-//   const audio = new Audio(filePath);
-
-//   // Creating loop button
-//   const loopButton = document.createElement("button");
-//   if (loopOn) {
-//     loopButton.classList.add("loop-clicked");
-//   } else {
-//     loopButton.classList.add("loop-button");
-//   }
-//   loopButton.innerHTML = '<img src="assets/loop.png" width="25" height="25">';
-//   loopButton.addEventListener("click", (e) => setLoop(e));
-//   loopButton.addEventListener("mouseover", (e) => hoverEffect(e));
-//   loopButton.addEventListener("mouseout", () => unhoverEffect());
-//   container.appendChild(loopButton);
-
-//   // Adding rename button
-//   const pencilButton = document.createElement("button");
-//   pencilButton.classList.add("pen-button");
-//   pencilButton.innerHTML = '<img src="assets/pencil.png" width="25" height="25">';
-//   pencilButton.addEventListener("click", (e) => renameButton(e));
-//   pencilButton.addEventListener("mouseover", (e) => hoverEffect(e));
-//   pencilButton.addEventListener("mouseout", () => unhoverEffect());
-//   container.appendChild(pencilButton);
-
-//   // Adding delete button
-//   const deleteButton = document.createElement("button");
-//   deleteButton.classList.add("delete-button");
-//   deleteButton.innerHTML = '<img src="assets/delete.png" width="25" height="25">';
-//   deleteButton.addEventListener("click", (e) => deleteFunc(e));
-//   deleteButton.addEventListener("mouseover", (e) => hoverEffect(e));
-//   deleteButton.addEventListener("mouseout", () => unhoverEffect());
-//   container.appendChild(deleteButton);
-
-//   // Adding volume slider
-//   const volumeSlider = document.createElement("input");
-//   volumeSlider.type = "range";
-//   volumeSlider.min = 0;
-//   volumeSlider.max = 100;
-//   // Checking if loaded value is being passed
-//   if (vol === null) {
-//     volumeSlider.value = 100;
-//   } else {
-//     volumeSlider.value = vol;
-//     const masterVolume = masterVolumeSlider.value / 100;
-//     audio.volume = (vol * masterVolume) / 100;
-//   }
-//   volumeSlider.classList.add("volume-slider");
-//   volumeSlider.addEventListener("input", (e) => setVolume(e));
-//   volumeSlider.addEventListener("mouseover", (e) => hoverEffect(e));
-//   volumeSlider.addEventListener("mouseout", () => unhoverEffect());
-//   container.appendChild(volumeSlider);
-
-//   // Tracking button data
-//   buttonList.push({
-//     soundButton: newButton,
-//     loopButton: loopButton,
-//     audioFile: audio,
-//     volumeSlider: volumeSlider,
-//     name: buttonName,
-//     deleteButton: deleteButton,
-//     penButton: pencilButton,
-//     soundDiv: container,
-//   });
-
-//   // Keeping track of data to save
-//   userData.push({
-//     path: filePath,
-//     name: buttonName,
-//     vol: volumeSlider.value,
-//     loopOn: loopButton.className == "loop-clicked",
-//   });
-
-//   // Saving only if not iterating through loaded sounds
-//   if (name === null) {
-//     saveFile();
-//   }
-// }
-
-// async function deleteFunc(event) {
-//   // Grabbing button group
-//   const parentContainer = event.target.parentElement;
-//   const parentId = parentContainer.id;
-
-//   buttonList[parentId].soundButton.classList.add("deleted");
-//   buttonList[parentId].loopButton.classList.add("deleted");
-//   buttonList[parentId].deleteButton.classList.add("deleted");
-//   buttonList[parentId].penButton.classList.add("deleted");
-//   buttonList[parentId].volumeSlider.classList.add("deleted");
-
-//   await new Promise((resolve) =>
-//     setTimeout(() => {
-//       resolve();
-//     }, 360)
-//   );
-
-//   // Remove entire button group
-//   parentContainer.remove();
-
-//   // Making sure sound stops playing if deleted
-//   sound = buttonList[parentId].audioFile;
-//   sound.pause();
-
-//   // Updating arrays
-//   buttonList.splice(parentId, 1);
-//   userData.splice(parentId, 1);
-
-//   // Updating HTML IDs
-//   for (let i = buttonList.length; i > parentId; i--) {
-//     let soundContainer = document.getElementById(`${i}`);
-//     soundContainer.id = `${i - 1}`;
-//   }
-
-//   // Updating saved file
-//   saveFile();
-// }
-
-// function setLoop(event) {
-//   // Grabbing button group
-//   const parentId = event.target.parentElement.id;
-//   const loopButton = buttonList[parentId].loopButton;
-
-//   // Checking if button is clicked
-//   loopButton.className = loopButton.className == "loop-clicked" ? "loop-button" : "loop-clicked";
-
-//   // Resetting sound if loop is unclicked
-//   if (loopButton.className == "loop-button") {
-//     const sound = buttonList[parentId].audioFile;
-//     sound.pause();
-//     sound.currentTime = 0;
-//   }
-
-//   // Updating saved file
-//   userData[parentId].loopOn = loopButton.className == "loop-clicked";
-//   saveFile();
-// }
-
-// function setVolume(event) {
-//   // Grabbing button group
-//   const parentId = event.target.parentElement.id;
-//   const volumeSlider = buttonList[parentId].volumeSlider;
-
-//   // Grabbing master and local volume
-//   const volume = volumeSlider.value / 100;
-//   const sound = buttonList[parentId].audioFile;
-//   const masterVolume = masterVolumeSlider.value / 100;
-
-//   // Setting volume
-//   sound.volume = volume * masterVolume;
-
-//   // Updating saved file
-//   userData[parentId].vol = volume * 100;
-//   saveFile();
-// }
-
-// function hoverEffect(event) {
-//   // Grabbing button group
-//   let parentId;
-//   if (event.target.nodeName == "DIV") {
-//     parentId = event.target.id;
-//   } else {
-//     parentId = event.target.parentElement.id;
-//   }
-
-//   for (let i = 0; i < buttonList.length; i++) {
-//     if (i == parentId) {
-//       continue;
-//     }
-//     buttonList[i].soundDiv.classList.add("unhovered");
-//   }
-// }
-
-// function unhoverEffect() {
-//   for (let i = 0; i < buttonList.length; i++) {
-//     buttonList[i].soundDiv.classList.remove("unhovered");
-//   }
-// }
-
-// function playSound(event) {
-//   // Grabbing button group
-//   const parentId = event.target.parentElement.id;
-//   const sound = buttonList[parentId].audioFile;
-
-//   // Checking if loop button is toggled
-//   const isLoop = buttonList[parentId].loopButton.className == "loop-clicked";
-
-//   // Sets sound to loop if button is checked
-//   if (isLoop) {
-//     sound.loop = true;
-//   }
-
-//   // Restarts sound if it's already playing
-//   if (isSoundPlaying(sound)) {
-//     sound.pause();
-//     sound.currentTime = 0;
-//   }
-//   sound.play();
-// }
-
-// // Function to check if sound is already playing
-// function isSoundPlaying(audio) {
-//   return !audio.paused && !audio.muted && audio.currentTime > 0 && audio.readyState >= 2;
-// }
-
-// // Function to save data to file
-// function saveFile() {
-//   // Button data
-//   const jsonData = JSON.stringify(userData);
-//   fs.writeFile("ButtonData.txt", jsonData, function (err) {
-//     if (err) {
-//       console.log(err);
-//     }
-//   });
-
-//   // User options
-//   const options = {
-//     mainVolume: masterVolumeSlider.value,
-//     columns: columnInput.value,
-//   };
-//   const userJSON = JSON.stringify(options);
-//   fs.writeFile("UserData.txt", userJSON, function (err) {
-//     if (err) {
-//       console.log(err);
-//     }
-//   });
-// }
-
-// async function renameButton(event) {
-//   // Grabbing button group
-//   const parentId = event.target.parentElement.id;
-
-//   // Grabbing existing name
-//   const oldName = buttonList[parentId].name;
-
-//   // Opening modal window
-//   let name = await getFormValue(oldName);
-
-//   // Renaming button in arrays and on screen
-//   buttonList[parentId].soundButton.textContent = name;
-//   buttonList[parentId].name = name;
-//   userData[parentId].name = name;
-
-//   // Updating saved file
-//   saveFile();
-// }
-
-// // Function to reset all volumes and loop buttons
-// function resetAll() {
-//   for (let i = 0; i < buttonList.length; i++) {
-//     buttonList[i].loopButton.className = "loop-button";
-//     buttonList[i].volumeSlider.value = 100;
-
-//     userData[i].loopOn = false;
-//     userData[i].vol = 100;
-//   }
-
-//   masterVolumeSlider.value = 100;
-
-//   // Updating saved file
-//   saveFile();
-// }
-
-// // Function to alphabetize all buttons
-// function alphabetize() {
-//   // Sorting button and user data lists
-//   buttonList = buttonList.sort((a, b) => {
-//     if (a.name.toLowerCase() < b.name.toLowerCase()) {
-//       return -1;
-//     }
-//   });
-
-//   userData = userData.sort((a, b) => {
-//     if (a.name.toLowerCase() < b.name.toLowerCase()) {
-//       return -1;
-//     }
-//   });
-
-//   const totalButtons = userData.length;
-
-//   // Resetting IDs
-//   for (let i = 0; i < totalButtons; i++) {
-//     buttonList[i].soundButton.parentElement.id = `${i}`;
-//     buttonList[i].soundButton.parentElement.style.order = i;
-//   }
-
-//   // Redoing grid positions
-//   // for (let i = 0; i < totalButtons; i++) {
-//   //   let soundContainer = document.getElementById(`${i}`);
-//   //   soundContainer.style.order = i;
-//   // }
-
-//   // Updating saved file
-//   saveFile();
-// }
-
-function answer() {
-  let childWindow = window.open("html/input.html", "width=100,height=100,modal");
-}
-
