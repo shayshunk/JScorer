@@ -19,6 +19,70 @@ let singleJeopardyData = [],
 const scoreText = document.getElementById("Score");
 const answerBtns = document.querySelectorAll(".answer-button"); // Gets buttons from main page initially
 
+class GameHistory { //History of the game
+  #index;           //Index, 0 at beginning, incremented with each answer
+  #answerInfo;      //Data about each answer, see below
+  #upToDate;        //Boolean to check if UNDO is in effect
+
+  constructor() {
+    this.#index = 0;
+    this.#answerInfo = [];
+    this.#upToDate = true;
+    console.log(this.#index);
+  }
+
+  addAnswer(state, value, location, dailyDouble){
+    const dataEntry = {
+      state: state,             //0 default - 1 No Answer - 2 Correct - 3 Wrong, bucko
+      value: value,             //Score of each answer, taken from button value
+      location: location,       //Number (location) of each button, to restore/remove state from correct button
+      dailyDouble: dailyDouble  //Is it a DD or no?
+    };
+    if(this.#upToDate){                         //Check if UNDO is in effect
+      this.#answerInfo.push(dataEntry);   //Add the 4 values to the end of the array, 
+    }
+    else{
+      this.#answerInfo[this.#index] = dataEntry;
+    }
+      console.log(this.#index);
+    this.#index++;
+    console.log(this.#index);           //Debug info, can erase later
+    console.log(this.#answerInfo[this.#index - 1]); //Debug
+  }
+
+  undo(){
+    console.log("Undo Clicked.");
+    this.#upToDate = false;
+    this.#index--;
+    return this.#answerInfo[this.#index];
+  }
+
+  redo(){
+    console.log("Redo clicked.");
+    const returnInfo = this.#answerInfo[this.#index];
+    this.#index++;
+    return returnInfo;
+  }
+
+  reset(){
+    this.#index = 0;
+    this.#answerInfo = [];
+    console.log("Reset game history.")
+  }
+
+  upToDate(){
+    if(this.#answerInfo.length === this.#index){
+      console.log(this.#answerInfo.length);
+      console.log(this.#index);
+      this.#upToDate = true;
+      return this.#upToDate;
+    }
+  }
+
+}
+
+const gameHistory = new GameHistory();
+
 answerBtns.forEach((btn) => {
   // Assigning button ids
   btn.id = counter;
@@ -71,6 +135,9 @@ const modal = document.getElementById("myModal");
 
 // --- Elements for the Double Jeopardy modal ---
 const openDoubleJeopardyBtn = document.getElementById("openDoubleJeopardyBtn");
+
+const redoBtn = document.getElementById("redoBtn");
+const undoBtn = document.getElementById("Undo");
 
 // Load most recent file
 async function loadFile() {
@@ -170,6 +237,8 @@ if (checkButton) {
     }
     scoreValue = scoreValue + buttonValue;
 
+    gameHistory.addAnswer(2, buttonValue, answerButton.id, doubleOn);  //Add correcrt answer to history
+
     // Updating array
     if (singleJeopardy) {
       singleJeopardyData[answerButton.id].answer = 2;
@@ -208,6 +277,8 @@ if (wrongButton) {
       scoreValue = scoreValue - buttonValue;
     }
 
+    gameHistory.addAnswer(3, buttonValue, answerButton.id, doubleOn);
+
     // Updating array
     if (singleJeopardy) {
       singleJeopardyData[answerButton.id].answer = 3;
@@ -235,6 +306,9 @@ if (wrongButton) {
 
 if (noAnswerButton) {
   noAnswerButton.addEventListener("click", () => {
+
+    gameHistory.addAnswer(1, buttonValue, answerButton.id, doubleOn);
+
     // Updating array
     if (singleJeopardy) {
       singleJeopardyData[answerButton.id].answer = 1;
@@ -265,6 +339,9 @@ if (resetButton) {
     // Reset score
     scoreValue = 0;
     scoreText.textContent = "Score: $0";
+    gameHistory.reset();
+
+    redoBtn.style.visibility = "hidden";
 
     // Go back to single jeopardy
     if (!singleJeopardy) {
@@ -293,6 +370,52 @@ if (doubleButton) {
         : "double-clicked";
     doubleOn = doubleButton.className == "double-clicked" ? true : false;
   });
+}
+
+//Function for Undo button and Redo button
+
+function undoButton(){
+  const undoEntry = gameHistory.undo();             //Return the last entry in the gameHistory array
+  if(undoEntry != null){                            //Error check
+    if(undoEntry.state == 2){
+      scoreValue = scoreValue - undoEntry.value;    //Deduct the .value entry for a correct response
+    }
+    if(undoEntry.state == 3){
+      scoreValue = scoreValue + undoEntry.value;    //Add .value for wrong response
+    }
+    //console.log(undoEntry);                         //Debug
+    updateScore();                                  //Update the score
+
+    const revealButton = document.getElementById(undoEntry.location);
+    revealButton.style.visibility = "visible";  //Make the previous button visible again
+    redoBtn.style.visibility = "visible";
+  }
+  else return;
+
+}
+
+function redoButton(){
+  const redoEntry = gameHistory.redo();
+  if(redoEntry != null) {
+    if(redoEntry.state == 2){
+      scoreValue = scoreValue + redoEntry.value;    //Add the .value entry for a correct response
+    }
+    if(redoEntry.state == 3){
+      scoreValue = scoreValue - redoEntry.value;    //Deduct .value for wrong response
+    }
+    updateScore();
+
+    const revealButton = document.getElementById(redoEntry.location);
+    revealButton.style.visibility = "hidden";  //Make the previous button visible again
+    if(gameHistory.upToDate()){
+      redoBtn.style.visibility = "hidden";
+    }
+  }
+  else{
+    redoBtn.style.visibility = "hidden";      //Should never trigger
+    return;
+  }
+
 }
 
 // --- Functions and Listeners for Double Jeopardy Modal ---
@@ -356,6 +479,20 @@ if (openDoubleJeopardyBtn) {
   openDoubleJeopardyBtn.addEventListener("click", showDoubleJeopardy);
 } else {
   console.error("Button with ID 'openDoubleJeopardyBtn' not found.");
+}
+
+// Listener for the Undo and Redo buttons
+if (undoBtn) {
+  undoBtn.addEventListener("click", undoButton);
+} else {
+  console.error("Button with ID 'undoBtn' not found.");
+}
+
+if (redoBtn) {
+  redoBtn.addEventListener("click", redoButton);
+  redoBtn.style.visibility = "hidden";
+} else {
+  console.error("Button with ID 'redoBtn' not found.");
 }
 
 // --- DOMContentLoaded ---
