@@ -46,10 +46,14 @@ class GameHistory {
       this.#answerInfo[this.#index] = dataEntry;
     }
     //console.log(this.#index);
+
+    // Grabbing undo button
+    if (this.#index == 0) {
+      const tempUndoBtn = document.getElementById("Undo");
+      tempUndoBtn.style.visibility = "visible";
+    }
+
     this.#index++;
-    // console.log(this.#index); //Debug info, can erase later
-    // console.log(this.#answerInfo[this.#index - 1]); //Debug
-    // console.log(this.#answerInfo); //Debug
   }
 
   undo() {
@@ -58,7 +62,9 @@ class GameHistory {
       this.#upToDate = false;
       this.#index--;
       return this.#answerInfo[this.#index];
-    } else return null;
+    } else {
+      return null;
+    }
   }
 
   redo() {
@@ -81,6 +87,10 @@ class GameHistory {
       this.#upToDate = true;
       return this.#upToDate;
     }
+  }
+
+  getVisible() {
+    return this.#index == 0 ? "hidden" : "visible";
   }
 }
 
@@ -382,6 +392,9 @@ if (resetButton) {
       doubleJeopardyData[btn.id].double = false;
     });
 
+    // Hiding undo button
+    undoBtn.style.visibility = "hidden";
+
     // Saving
     saveFile();
   });
@@ -433,6 +446,9 @@ function undoButton() {
       doubleJeopardyData[buttonId].answer = 0;
     }
 
+    // Setting button visibility
+    undoBtn.style.visibility = gameHistory.getVisible();
+
     // Saving
     saveFile();
   } else {
@@ -469,6 +485,9 @@ function redoButton() {
     } else {
       doubleJeopardyData[buttonId].answer = redoEntry.answer;
     }
+
+    // Setting button visibility
+    undoBtn.style.visibility = gameHistory.getVisible();
 
     // Saving
     saveFile();

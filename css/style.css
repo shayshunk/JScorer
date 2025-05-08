@@ -47,6 +47,10 @@ body {
   padding: 2%;
 }
 
+#Undo {
+  visibility: hidden;
+}
+
 .submitButton {
   background-color: rgb(0, 0, 255);
   border: none;
