@@ -1,5 +1,4 @@
 // Node and electron requirements
-const { ipcRenderer } = require("electron");
 var fs = require("fs");
 
 // Get base score value
@@ -381,7 +380,7 @@ if (doubleButton) {
   });
 }
 
-//Function for Undo button and Redo button
+//Functions for Undo button and Redo button
 
 function undoButton() {
   const undoEntry = gameHistory.undo(); //Return the last entry in the gameHistory array
@@ -401,7 +400,20 @@ function undoButton() {
     const revealButton = document.getElementById(undoEntry.location);
     revealButton.style.visibility = "visible"; //Make the previous button visible again
     redoBtn.style.visibility = "visible";
-  } else return;
+
+    // Updating array
+    const buttonId = revealButton.id;
+    if (undoEntry.round) {
+      singleJeopardyData[buttonId].answer = 0;
+    } else {
+      doubleJeopardyData[buttonId].answer = 0;
+    }
+
+    // Saving
+    saveFile();
+  } else {
+    return;
+  }
 }
 
 function redoButton() {
@@ -422,6 +434,17 @@ function redoButton() {
     if (gameHistory.upToDate()) {
       redoBtn.style.visibility = "hidden";
     }
+
+    // Updating array
+    const buttonId = revealButton.id;
+    if (undoEntry.round) {
+      singleJeopardyData[buttonId].answer = 0;
+    } else {
+      doubleJeopardyData[buttonId].answer = 0;
+    }
+
+    // Saving
+    saveFile();
   } else {
     redoBtn.style.visibility = "hidden"; //Should never trigger
     return;
