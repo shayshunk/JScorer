@@ -240,13 +240,14 @@ if (checkButton) {
     }
     scoreValue = scoreValue + buttonValue;
 
+    // Add correct answer to history
     gameHistory.addAnswer(
       2,
       buttonValue,
       answerButton.id,
       doubleOn,
       singleJeopardy
-    ); //Add correcrt answer to history
+    );
 
     // Updating array
     if (singleJeopardy) {
@@ -286,7 +287,14 @@ if (wrongButton) {
       scoreValue = scoreValue - buttonValue;
     }
 
-    gameHistory.addAnswer(3, buttonValue, answerButton.id, doubleOn);
+    // Add incorrect answer to history
+    gameHistory.addAnswer(
+      3,
+      buttonValue,
+      answerButton.id,
+      doubleOn,
+      singleJeopardy
+    );
 
     // Updating array
     if (singleJeopardy) {
@@ -325,6 +333,15 @@ if (noAnswerButton) {
       doubleJeopardyData[answerButton.id].answer = 1;
       doubleJeopardyData[answerButton.id].double = doubleOn;
     }
+
+    // Add no answer to history
+    gameHistory.addAnswer(
+      1,
+      buttonValue,
+      answerButton.id,
+      doubleOn,
+      singleJeopardy
+    );
 
     if (modal) {
       modal.style.display = "none";
@@ -398,14 +415,21 @@ function undoButton() {
     updateScore(); //Update the score
 
     const revealButton = document.getElementById(undoEntry.location);
-    revealButton.style.visibility = "visible"; //Make the previous button visible again
+    if (undoEntry.round === singleJeopardy) {
+      revealButton.style.visibility = "visible"; //Make the previous button visible again
+    }
+
     redoBtn.style.visibility = "visible";
 
     // Updating array
     const buttonId = revealButton.id;
     if (undoEntry.round) {
+      console.log(undoEntry.round);
+      console.log(buttonId);
       singleJeopardyData[buttonId].answer = 0;
     } else {
+      console.log(undoEntry.round);
+      console.log(buttonId);
       doubleJeopardyData[buttonId].answer = 0;
     }
 
@@ -430,17 +454,20 @@ function redoButton() {
     updateScore();
 
     const revealButton = document.getElementById(redoEntry.location);
-    revealButton.style.visibility = "hidden"; //Make the previous button visible again
+    //Make the previous button visible again
+    if (redoEntry.round === singleJeopardy) {
+      revealButton.style.visibility = "hidden";
+    }
     if (gameHistory.upToDate()) {
       redoBtn.style.visibility = "hidden";
     }
 
     // Updating array
     const buttonId = revealButton.id;
-    if (undoEntry.round) {
-      singleJeopardyData[buttonId].answer = 0;
+    if (redoEntry.round) {
+      singleJeopardyData[buttonId].answer = redoEntry.answer;
     } else {
-      doubleJeopardyData[buttonId].answer = 0;
+      doubleJeopardyData[buttonId].answer = redoEntry.answer;
     }
 
     // Saving
